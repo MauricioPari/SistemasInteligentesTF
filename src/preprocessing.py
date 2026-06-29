@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 
-def preprocess_data(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
+def preprocess_data(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
     """Limpiar, codificar y escalar los datos para el entrenamiento de modelo."""
     df_clean = df.copy()
 
@@ -39,7 +39,7 @@ def preprocess_data(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     ]
 
     X = df_clean[feature_columns].copy()
-    y = df_clean['AT_RISK_BINARY'].copy()
+    y = df_clean['AT_RISK_BINARY']
 
     # Codificar categóricas con OneHotEncoding.
     categorical_features = X.select_dtypes(include='object').columns.tolist()

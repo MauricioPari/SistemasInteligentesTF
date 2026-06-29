@@ -24,7 +24,25 @@ def save_confusion_matrix(y_true, y_pred, output_file: Path) -> None:
 
 def save_feature_importance(model, feature_names, output_file: Path, top_n: int = 20) -> None:
     """Guardar la importancia de features del modelo entrenado."""
-    importances = model.feature_importances_
+    if not hasattr(model, "feature_importances_"):
+        # No rompe; simplemente no guarda la gráfica
+        return
+
+    importances = getattr(model, "feature_importances_", None)
+    if importances is None:
+        return
+
+    if feature_names is None:
+        return
+
+    # Asegurar tamaños compatibles
+    if len(importances) != len(feature_names):
+        # No intentar; evitar errores por desalineación
+        return
+
+    # top_n no puede exceder
+    top_n = min(top_n, len(importances))
+
     indices = np.argsort(importances)[::-1][:top_n]
     top_features = [feature_names[i] for i in indices]
     top_importances = importances[indices]
@@ -33,7 +51,7 @@ def save_feature_importance(model, feature_names, output_file: Path, top_n: int 
     sns.barplot(x=top_importances, y=top_features, palette='viridis')
     plt.xlabel('Importance')
     plt.ylabel('Feature')
-    plt.title('Feature Importance (top {} variables)'.format(top_n))
+    plt.title(f'Feature Importance (top {top_n} variables)')
     plt.tight_layout()
     output_file.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_file, dpi=200)
